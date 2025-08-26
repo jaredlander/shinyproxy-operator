@@ -3,5 +3,5 @@ kind: Kustomization
 namespace: shinyproxy-operator
 
 resources:
-  - github.com/openanalytics/shinyproxy-operator/docs/deployment/bases/clustered?ref=v2.2.1
+  - github.com/openanalytics/shinyproxy-operator/docs/deployment/bases/clustered?ref=v2.2.2
   - resources/shinyproxy-operator.namespace.yaml
