@@ -44,7 +44,7 @@ class RedisConfig(private val dockerClient: DockerClient,
     private val dataDir: Path = mainDataDir.resolve(containerName)
     private lateinit var redisPassword: String
     private val logger = KotlinLogging.logger {}
-    private val redisImage: String = config.readConfigValue("docker.io/library/redis:7.2.4", "SPO_REDIS_IMAGE") { it }
+    private val redisImage: String = config.readConfigValue("docker.io/library/redis:8.2.2", "SPO_REDIS_IMAGE") { it }
     private val fileManager = FileManager()
 
     fun init() {
