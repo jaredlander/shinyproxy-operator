@@ -28,14 +28,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -360,6 +358,7 @@ class MainIntegrationTest : IntegrationTestBase() {
         val operator2 = DockerOperator(config, eventController, recyclableChecker)
         eventController.setDelegate(EventController(operator2.orchestrator))
         scope.launch {
+            delay(5_000) // wait with starting operator, until event listener is created
             eventController.setDelegate(EventController(operator2.orchestrator))
             operator2.init()
             operator2.run()
