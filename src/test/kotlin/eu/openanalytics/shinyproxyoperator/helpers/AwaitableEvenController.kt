@@ -22,10 +22,13 @@ package eu.openanalytics.shinyproxyoperator.helpers
 
 import eu.openanalytics.shinyproxyoperator.IEventController
 import eu.openanalytics.shinyproxyoperator.model.ShinyProxyInstance
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CompletableDeferred
 
 
 class AwaitableEvenController : IEventController {
+
+    private val logger = KotlinLogging.logger {  }
 
     private val listeners = Listener<String>()
     private val deleteListeners = Listener<Unit>()
@@ -42,11 +45,13 @@ class AwaitableEvenController : IEventController {
     }
 
     suspend fun waitForNewInstance(hash: String, revision: Int = 0): ShinyProxyInstance {
+        logger.info { "--> waiting for NewInstance: hash: $hash, revision: $revision" }
         return newInstanceListeners.add(hash, revision).awaitWithTimeout()
     }
 
     override fun createNewInstanceEvent(shinyProxyInstance: ShinyProxyInstance) {
         delegate.createNewInstanceEvent(shinyProxyInstance)
+        logger.info { "<-- event NewInstance: hash: ${shinyProxyInstance.hashOfSpec}, revision: ${shinyProxyInstance.revision}" }
         newInstanceListeners.complete(shinyProxyInstance, shinyProxyInstance)
     }
 
