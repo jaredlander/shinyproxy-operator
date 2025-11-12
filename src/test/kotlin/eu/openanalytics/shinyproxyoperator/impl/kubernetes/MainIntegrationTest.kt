@@ -166,7 +166,7 @@ class MainIntegrationTest : IntegrationTestBase() {
             // 4. assert correctness
             spTestInstance.assertInstanceIsCorrect()
 
-            // wait for additionale reconcile to complete
+            // wait for additional reconcile to complete
             eventController.waitForNextReconcile(spTestInstance.hash)
 
             // 5. Delete Replicaset -> reconcile -> assert it is still ok
@@ -178,14 +178,8 @@ class MainIntegrationTest : IntegrationTestBase() {
                 }
             }
             logger.info { "ReplicaSet was deleted" }
-            eventController.waitForNextReconcile(spTestInstance.hash)
+            waitForNextReconcileAndReady(stableClient, sp, spTestInstance, eventController)
             logger.info { "Reconciled after deleting RS" }
-
-            withTimeout(10_000) {
-                while (stableClient.apps().replicaSets().withName(replicaSetName)?.get()?.status?.readyReplicas != 1) {
-                    delay(100)
-                }
-            }
 
             spTestInstance.assertInstanceIsCorrect()
 
@@ -194,7 +188,7 @@ class MainIntegrationTest : IntegrationTestBase() {
                 getAndDelete(stableClient.configMaps().withName("sp-${sp.name}-cm-${spTestInstance.hash}".take(63)))
                 logger.info { "Deleted ConfigMap" }
             }
-            eventController.waitForNextReconcile(spTestInstance.hash)
+            waitForNextReconcileAndReady(stableClient, sp, spTestInstance, eventController)
             logger.info { "Reconciled after deleting CM" }
             spTestInstance.assertInstanceIsCorrect()
 
@@ -203,7 +197,7 @@ class MainIntegrationTest : IntegrationTestBase() {
                 getAndDelete(stableClient.services().withName("sp-${sp.name}-svc".take(63)))
                 logger.info { "Deleted Service" }
             }
-            eventController.waitForNextReconcile(spTestInstance.hash)
+            waitForNextReconcileAndReady(stableClient, sp, spTestInstance, eventController)
             logger.info { "Reconciled after deleting SVC" }
             spTestInstance.assertInstanceIsCorrect()
 
@@ -212,7 +206,7 @@ class MainIntegrationTest : IntegrationTestBase() {
                 getAndDelete(stableClient.network().v1().ingresses().withName("sp-${sp.name}-ing".take(63)))
                 logger.info { "Deleted Ingress" }
             }
-            eventController.waitForNextReconcile(spTestInstance.hash)
+            waitForNextReconcileAndReady(stableClient, sp, spTestInstance, eventController)
             spTestInstance.assertInstanceIsCorrect()
             logger.info { "Reconciled after deleting Ingress" }
         }

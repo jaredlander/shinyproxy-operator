@@ -234,4 +234,18 @@ abstract class IntegrationTestBase {
         resource.delete()
     }
 
+    protected suspend fun waitForNextReconcileAndReady(stableClient: NamespacedKubernetesClient, sp: ShinyProxy, spTestInstance: ShinyProxyTestInstance, eventController: AwaitableEvenController) {
+        eventController.waitForNextReconcile(spTestInstance.hash)
+        for (i in 0..2) {
+            val replicaSetName = "sp-${sp.name}-rs-0-${spTestInstance.hash}".take(63)
+            if (stableClient.apps().replicaSets().withName(replicaSetName)?.get()?.status?.readyReplicas == 1
+                && stableClient.configMaps().withName("sp-${sp.name}-cm-${spTestInstance.hash}".take(63)).get() != null
+                && stableClient.services().withName("sp-${sp.name}-svc".take(63)) != null
+                && stableClient.network().v1().ingresses().withName("sp-${sp.name}-ing".take(63)).get() != null) {
+                return
+            }
+            eventController.waitForNextReconcile(spTestInstance.hash)
+        }
+    }
+
 }
