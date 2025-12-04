@@ -39,3 +39,17 @@ The build will result in a single `.jar` file:
 ## Java Version
 
 This project requires JDK 21.
+
+## CI/CD
+
+This repository includes automated GitHub Actions workflows for building and deploying the ShinyProxy Operator.
+
+### Docker Image Build and Push
+
+A workflow automatically builds the operator JAR, creates a Docker image, and pushes it to a Container Registry. See [docs/CI-CD.md](docs/CI-CD.md) for detailed documentation on:
+
+- Workflow configuration
+- Required secrets setup
+- Docker image tags
+- Manual workflow dispatch
+- Local development replication
