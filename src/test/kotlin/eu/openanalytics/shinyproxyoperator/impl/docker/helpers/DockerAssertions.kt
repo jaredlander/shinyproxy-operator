@@ -115,7 +115,7 @@ class DockerAssertions(private val base: IntegrationTestBase,
         }
     }
 
-    fun assertShinyProxyContainer(shinyProxyContainer: Container, shinyProxyInstance: ShinyProxyInstance) {
+    fun assertShinyProxyContainer(shinyProxyContainer: Container, shinyProxyInstance: ShinyProxyInstance, additionalEnv: Map<String, String?> = mapOf()) {
         val containerInfo = base.dockerClient.inspectContainer(shinyProxyContainer.id())
         assertEquals(true, containerInfo.state().running())
         assertEquals("sp-shared-network", containerInfo.hostConfig().networkMode())
@@ -137,11 +137,12 @@ class DockerAssertions(private val base: IntegrationTestBase,
             "openanalytics.eu/sp-realm-id" to shinyProxyInstance.realmId,
             "openanalytics.eu/sp-version" to null
         ), containerInfo.config().labels())
-        assertEnv(mapOf(
+        val expectedEnv = mapOf(
             "PROXY_VERSION" to null,
             "PROXY_REALM_ID" to shinyProxyInstance.realmId,
             "SPRING_CONFIG_IMPORT" to "/opt/shinyproxy/generated.yml"
-        ), containerInfo.config().env())
+        ) + additionalEnv
+        assertEnv(expectedEnv, containerInfo.config().env())
     }
 
 }

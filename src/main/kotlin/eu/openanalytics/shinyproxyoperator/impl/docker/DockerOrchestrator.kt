@@ -297,11 +297,22 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                         .build())
                 }
 
+                // Build environment variables list: default ones + user-provided ones
+                val envVars = mutableListOf(
+                    "PROXY_VERSION=${version}",
+                    "PROXY_REALM_ID=${shinyProxy.realmId}",
+                    "SPRING_CONFIG_IMPORT=/opt/shinyproxy/generated.yml"
+                )
+                // Add user-provided environment variables
+                shinyProxy.env.forEach { (key, value) ->
+                    envVars.add("${key}=${value}")
+                }
+
                 val containerConfig = ContainerConfig.builder()
                     .image(shinyProxy.image)
                     .hostConfig(hostConfigBuilder.build())
                     .labels(shinyProxy.labels + LabelFactory.labelsForShinyProxyInstance(shinyProxyInstance, version))
-                    .env("PROXY_VERSION=${version}", "PROXY_REALM_ID=${shinyProxy.realmId}", "SPRING_CONFIG_IMPORT=/opt/shinyproxy/generated.yml")
+                    .env(envVars)
                     .user(dataDirUid.toString())
                     .build()
 
