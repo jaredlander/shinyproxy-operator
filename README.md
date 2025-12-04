@@ -13,6 +13,10 @@ page in the documentation to understand why this is so great.
 
 See the [website](https://shinyproxy.io/documentation/shinyproxy-operator/kubernetes/) for all documentation.
 
+### Additional Documentation
+
+- [Environment Variables for ShinyProxy Container](docs/environment-variables.md) - How to set environment variables for the ShinyProxy container in Docker mode
+
 ## Support
 
 See the [website](https://shinyproxy.io/support/) on how to get support.
