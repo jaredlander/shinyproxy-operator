@@ -59,6 +59,8 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
     private val fileManager = FileManager()
     private val caddyImage: String = config.readConfigValue("docker.io/library/caddy:2.8", "SPO_CADDY_IMAGE") { it }
     private val enableTls = config.readConfigValue(false, "SPO_CADDY_ENABLE_TLS") { it.toBoolean() }
+    private val caddyPortHttp: Int = config.readConfigValue(80, "SPO_CADDY_PORT_HTTP") { it.toInt() }
+    private val caddyPortHttps: Int = config.readConfigValue(443, "SPO_CADDY_PORT_HTTPS") { it.toInt() }
     private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(3, TimeUnit.SECONDS)
         .readTimeout(3, TimeUnit.SECONDS)
@@ -101,7 +103,7 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
     }
 
     private fun generateServer(): Map<String, Any> {
-        val listen = if (enableTls) listOf(":443") else listOf(":80")
+        val listen = if (enableTls) listOf(":$caddyPortHttps") else listOf(":$caddyPortHttp")
         return mapOf("listen" to listen, "routes" to generateRoutes(), "tls_connection_policies" to generateTlsConnectionPolicies())
     }
 
@@ -277,7 +279,7 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
             logger.info { "[Caddy] Pulling image" }
             dockerActions.pullImage(caddyImage)
 
-            val ports = if (enableTls) listOf("80", "443") else listOf("80")
+            val ports = if (enableTls) listOf("$caddyPortHttp", "$caddyPortHttps") else listOf("$caddyPortHttp")
             val hostConfig = HostConfig.builder()
                 .networkMode(DockerOrchestrator.SHARED_NETWORK_NAME)
                 .binds(HostConfig.Bind.builder()
