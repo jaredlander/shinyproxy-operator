@@ -103,7 +103,7 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
     }
 
     private fun generateServer(): Map<String, Any> {
-        val listen = if (enableTls) listOf(":$caddyPortHttps") else listOf(":$caddyPortHttp")
+        val listen = if (enableTls) listOf(":443") else listOf(":80")
         return mapOf("listen" to listen, "routes" to generateRoutes(), "tls_connection_policies" to generateTlsConnectionPolicies())
     }
 
@@ -279,7 +279,17 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
             logger.info { "[Caddy] Pulling image" }
             dockerActions.pullImage(caddyImage)
 
-            val ports = if (enableTls) listOf("$caddyPortHttp", "$caddyPortHttps") else listOf("$caddyPortHttp")
+            val portBindings = if (enableTls) {
+                mapOf(
+                    "80" to listOf(PortBinding.of("0.0.0.0", caddyPortHttp.toString())),
+                    "443" to listOf(PortBinding.of("0.0.0.0", caddyPortHttps.toString()))
+                )
+            } else {
+                mapOf("80" to listOf(PortBinding.of("0.0.0.0", caddyPortHttp.toString())))
+            }
+
+            val ports = if (enableTls) listOf("80", "443") else listOf("80")
+
             val hostConfig = HostConfig.builder()
                 .networkMode(DockerOrchestrator.SHARED_NETWORK_NAME)
                 .binds(HostConfig.Bind.builder()
@@ -298,7 +308,7 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
                         .from(dataDir.resolve("certs").toString())
                         .to("/certs")
                         .build()
-                ).portBindings(ports.associateWith { listOf(PortBinding.of("0.0.0.0", it)) })
+                ).portBindings(portBindings)
                 .restartPolicy(HostConfig.RestartPolicy.always())
                 .build()
 
