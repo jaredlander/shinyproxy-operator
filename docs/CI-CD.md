@@ -11,8 +11,8 @@ The workflow is defined in `.github/workflows/build-and-push-docker.yaml`.
 ### Triggers
 
 The workflow is triggered on:
-- Pushes to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
+- Pushes to `main` or `dev` branches
+- Pull requests to `main` or `dev` branches
 - Tag pushes matching `v*` pattern (e.g., `v1.0.0`)
 - Manual workflow dispatch
 
@@ -65,7 +65,7 @@ To configure these secrets:
 
 The workflow automatically generates tags based on the Git context:
 
-- **Branch pushes**: `<branch-name>` (e.g., `main`, `develop`)
+- **Branch pushes**: `<branch-name>` (e.g., `main`, `dev`)
 - **Pull requests**: `pr-<number>` (e.g., `pr-123`)
 - **Version tags**: Multiple formats for semantic versioning
   - `<version>` (e.g., `1.2.3`)
