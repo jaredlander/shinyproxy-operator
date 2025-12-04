@@ -33,15 +33,21 @@ The workflow is triggered on:
 
 The workflow requires the following secrets to be configured in the GitHub repository:
 
+#### `ACR_REGISTRY`
+- **Description**: Azure Container Registry URL
+- **Type**: Repository Secret
+- **Usage**: The registry URL (e.g., `landeranalytics.azurecr.io`)
+- **Example**: `landeranalytics.azurecr.io`
+
 #### `ACR_USERNAME`
 - **Description**: Username for Azure Container Registry authentication
 - **Type**: Repository Secret
-- **Usage**: Used to authenticate with `landeranalytics.azurecr.io`
+- **Usage**: Used to authenticate with the Azure Container Registry
 
 #### `ACR_PASSWORD`
 - **Description**: Password for Azure Container Registry authentication
 - **Type**: Repository Secret
-- **Usage**: Used to authenticate with `landeranalytics.azurecr.io`
+- **Usage**: Used to authenticate with the Azure Container Registry
 
 ### Setting Up Secrets
 
@@ -51,6 +57,7 @@ To configure these secrets:
 2. Navigate to **Settings** > **Secrets and variables** > **Actions**
 3. Click **New repository secret**
 4. Add each secret with the name and value:
+   - Name: `ACR_REGISTRY`, Value: Your Azure Container Registry URL (e.g., `landeranalytics.azurecr.io`)
    - Name: `ACR_USERNAME`, Value: Your Azure Container Registry username
    - Name: `ACR_PASSWORD`, Value: Your Azure Container Registry password
 
@@ -68,7 +75,7 @@ The workflow automatically generates tags based on the Git context:
 
 ### Docker Registry
 
-Images are pushed to: `landeranalytics.azurecr.io/shinyproxy-operator`
+Images are pushed to the Azure Container Registry specified by the `ACR_REGISTRY` secret, under the repository name `shinyproxy-operator`.
 
 ### Build Arguments
 
@@ -105,9 +112,9 @@ If the Maven build fails:
 #### Docker Push Failures
 
 If pushing to the registry fails:
-- Verify that `ACR_USERNAME` and `ACR_PASSWORD` secrets are correctly set
+- Verify that `ACR_REGISTRY`, `ACR_USERNAME`, and `ACR_PASSWORD` secrets are correctly set
 - Ensure the service principal has push permissions to the registry
-- Check that the registry URL is correct: `landeranalytics.azurecr.io`
+- Check that the registry URL in `ACR_REGISTRY` is correct and accessible
 
 #### JAR Not Found
 
@@ -138,6 +145,6 @@ cp ../../shinyproxy-operator/target/shinyproxy-operator-jar-with-dependencies.ja
 docker build -t shinyproxy-operator-dev --build-arg JAR_LOCATION=shinyproxy-operator-jar-with-dependencies.jar .
 
 # Step 5: Tag and push (optional)
-docker tag shinyproxy-operator-dev landeranalytics.azurecr.io/shinyproxy-operator:dev
-docker push landeranalytics.azurecr.io/shinyproxy-operator:dev
+docker tag shinyproxy-operator-dev <your-registry>/shinyproxy-operator:dev
+docker push <your-registry>/shinyproxy-operator:dev
 ```

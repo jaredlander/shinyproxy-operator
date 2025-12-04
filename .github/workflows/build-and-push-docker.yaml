@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - main
-      - develop
+      - dev
     tags:
       - 'v*'
   pull_request:
     branches:
       - main
-      - develop
+      - dev
   workflow_dispatch:
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
       - name: Login to Azure Container Registry
         uses: docker/login-action@v3
         with:
-          registry: landeranalytics.azurecr.io
+          registry: ${{ secrets.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
       
@@ -69,7 +69,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: landeranalytics.azurecr.io/shinyproxy-operator
+          images: ${{ secrets.ACR_REGISTRY }}/shinyproxy-operator
           tags: |
             type=ref,event=branch
             type=ref,event=pr
