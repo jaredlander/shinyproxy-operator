@@ -640,30 +640,4 @@ class MainIntegrationTest : IntegrationTestBase() {
         ))
     }
 
-    @Test
-    fun `test with environment variables`() = setup { dataDir, inputDir, operator, eventController, dockerAssertions, _, _ ->
-        val hash = createInputFile(inputDir, "simple_config_with_env.yaml", "realm1.shinyproxy.yaml")
-        val shinyProxyInstance = ShinyProxyInstance("realm1", "default", "default-realm1", hash, true, 0)
-
-        scope.launch {
-            operator.init()
-            operator.run()
-        }
-
-        eventController.waitForNextReconcile(hash)
-
-        val shinyProxyContainer = getSingleShinyProxyContainer(shinyProxyInstance)
-        dockerAssertions.assertRedisContainer()
-        dockerAssertions.assertCaddyContainer("simple_test_caddy.json", mapOf("#CONTAINER_IP#" to shinyProxyContainer.getSharedNetworkIpAddress()!!))
-        dockerAssertions.assertShinyProxyContainer(
-            shinyProxyContainer,
-            shinyProxyInstance,
-            mapOf(
-                "MY_CUSTOM_VAR" to "custom_value",
-                "ANOTHER_VAR" to "another_value",
-                "DEBUG_MODE" to "true"
-            )
-        )
-    }
-
 }

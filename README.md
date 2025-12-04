@@ -13,9 +13,9 @@ page in the documentation to understand why this is so great.
 
 See the [website](https://shinyproxy.io/documentation/shinyproxy-operator/kubernetes/) for all documentation.
 
-### Additional Documentation
+### Docker Mode: Passing Environment Variables
 
-- [Environment Variables for ShinyProxy Container](docs/environment-variables.md) - How to set environment variables for the ShinyProxy container in Docker mode
+When using the operator in Docker mode, you can pass environment variables from the operator's environment to ShinyProxy containers. This is useful for injecting secrets without storing them in plain text. See [Environment Variables for Docker Mode](docs/environment-variables-docker.md) for details.
 
 ## Support
 

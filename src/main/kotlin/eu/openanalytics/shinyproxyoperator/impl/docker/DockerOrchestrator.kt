@@ -69,13 +69,6 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                          private val dataDir: Path,
                          private val inputDir: Path) : IOrchestrator {
 
-    companion object {
-        // Regex for validating environment variable key names
-        private val ENV_KEY_PATTERN = Regex("^[A-Za-z_][A-Za-z0-9_]*$")
-        // Reserved environment variable keys that cannot be overridden
-        private val RESERVED_ENV_KEYS = setOf("PROXY_VERSION", "PROXY_REALM_ID", "SPRING_CONFIG_IMPORT")
-    }
-
     private val dockerGID: Int = config.readConfigValue(null, "SPO_DOCKER_GID") { it.toInt() }
     private val dockerSocket: String = config.readConfigValue("/var/run/docker.sock", "SPO_DOCKER_SOCKET") { it }
     private val disableICC: Boolean = config.readConfigValue(false, "SPO_DISABLE_ICC") { it.toBoolean() }
@@ -304,39 +297,22 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                         .build())
                 }
 
-                // Build environment variables list: default ones + user-provided ones
-                val defaultEnvVars = mapOf(
-                    "PROXY_VERSION" to version.toString(),
-                    "PROXY_REALM_ID" to shinyProxy.realmId,
-                    "SPRING_CONFIG_IMPORT" to "/opt/shinyproxy/generated.yml"
+                // Build environment variables list: default ones + operator environment variables
+                val envVars = mutableListOf(
+                    "PROXY_VERSION=${version}",
+                    "PROXY_REALM_ID=${shinyProxy.realmId}",
+                    "SPRING_CONFIG_IMPORT=/opt/shinyproxy/generated.yml"
                 )
                 
-                val envVars = mutableListOf<String>()
-                
-                // Add user-provided environment variables, excluding reserved keys
-                // Reserved keys are filtered here to prevent any accidental override
-                shinyProxy.env.forEach { (key, value) ->
-                    when {
-                        RESERVED_ENV_KEYS.contains(key) -> {
-                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Ignoring attempt to override reserved environment variable '$key'" }
-                        }
-                        !ENV_KEY_PATTERN.matches(key) -> {
-                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid key name" }
-                        }
-                        !isValidEnvValue(value) -> {
-                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid value containing newline characters" }
-                        }
-                        else -> {
-                            envVars.add("${key}=${value}")
-                        }
+                // Add environment variables from the operator's environment
+                // Any environment variable with prefix SHINYPROXY_ENV_ will be passed to the container
+                // with the prefix stripped (e.g., SHINYPROXY_ENV_DATABASE_URL -> DATABASE_URL)
+                System.getenv().forEach { (key, value) ->
+                    if (key.startsWith("SHINYPROXY_ENV_")) {
+                        val targetKey = key.removePrefix("SHINYPROXY_ENV_")
+                        envVars.add("${targetKey}=${value}")
+                        logger.info { "${logPrefix(shinyProxyInstance)} [Docker] Passing environment variable '$targetKey' to ShinyProxy container" }
                     }
-                }
-                
-                // Add required default environment variables
-                // Note: Docker uses the last occurrence when duplicates exist, but we've already
-                // filtered reserved keys above to prevent conflicts
-                defaultEnvVars.forEach { (key, value) ->
-                    envVars.add("${key}=${value}")
                 }
 
                 val containerConfig = ContainerConfig.builder()
@@ -604,14 +580,6 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
             logger.warn(e) { "Failed to determine owner of data dir - falling back to user 1000" }
             return 1000
         }
-    }
-
-    /**
-     * Validates that an environment variable value is safe and does not contain
-     * characters that could enable injection attacks.
-     */
-    private fun isValidEnvValue(value: String): Boolean {
-        return !value.contains('\n') && !value.contains('\r')
     }
 
 }

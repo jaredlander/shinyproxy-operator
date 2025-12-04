@@ -103,7 +103,7 @@ class ShinyProxy(private val spec: JsonNode, val name: String, val namespace: St
     @get:JsonIgnore
     val labels: Map<String, String> by lazy {
         if (getSpec().get("labels")?.isObject == true) {
-            return@lazy jacksonObjectMapper().convertValue<Map<String, String>>(getSpec().get("labels"))
+            return@lazy jacksonObjectMapper().convertValue(getSpec().get("labels"))
         }
         return@lazy mapOf()
     }
@@ -134,14 +134,6 @@ class ShinyProxy(private val spec: JsonNode, val name: String, val namespace: St
             return@lazy spec.get("dns").elements().asSequence().map { it.textValue() }.toList()
         }
         return@lazy listOf()
-    }
-
-    @get:JsonIgnore
-    val env: Map<String, String> by lazy {
-        if (getSpec().get("env")?.isObject == true) {
-            return@lazy jacksonObjectMapper().convertValue<Map<String, String>>(getSpec().get("env"))
-        }
-        return@lazy mapOf()
     }
 
     fun getSpec(): JsonNode {
