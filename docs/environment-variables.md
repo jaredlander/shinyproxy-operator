@@ -46,7 +46,10 @@ spec:
 
 - Environment variables are passed directly to the ShinyProxy container
 - The operator will automatically add required environment variables such as `PROXY_VERSION`, `PROXY_REALM_ID`, and `SPRING_CONFIG_IMPORT`
-- User-provided environment variables can override these defaults if needed (though this is not recommended)
+- **Security**: User-provided environment variables cannot override reserved environment variables (`PROXY_VERSION`, `PROXY_REALM_ID`, `SPRING_CONFIG_IMPORT`)
+- **Validation**: Environment variable keys must follow standard naming conventions (alphanumeric characters and underscores, starting with a letter or underscore)
+- **Validation**: Environment variable values cannot contain newline characters (to prevent injection attacks)
+- Invalid environment variables will be skipped with a warning logged
 - This feature is currently only available for Docker backend deployments
 - For Kubernetes deployments, use `kubernetesPodTemplateSpecPatches` to add environment variables
 

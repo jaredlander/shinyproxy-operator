@@ -298,13 +298,36 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 }
 
                 // Build environment variables list: default ones + user-provided ones
-                val envVars = mutableListOf(
-                    "PROXY_VERSION=${version}",
-                    "PROXY_REALM_ID=${shinyProxy.realmId}",
-                    "SPRING_CONFIG_IMPORT=/opt/shinyproxy/generated.yml"
+                val defaultEnvVars = mapOf(
+                    "PROXY_VERSION" to version.toString(),
+                    "PROXY_REALM_ID" to shinyProxy.realmId,
+                    "SPRING_CONFIG_IMPORT" to "/opt/shinyproxy/generated.yml"
                 )
-                // Add user-provided environment variables
+                
+                val envVars = mutableListOf<String>()
+                
+                // Add user-provided environment variables first, but exclude reserved keys
                 shinyProxy.env.forEach { (key, value) ->
+                    // Prevent overriding default environment variables
+                    if (!defaultEnvVars.containsKey(key)) {
+                        // Validate key: only allow alphanumeric characters and underscores
+                        if (key.matches(Regex("^[A-Za-z_][A-Za-z0-9_]*$"))) {
+                            // Validate value: prevent newline characters that could enable injection
+                            if (!value.contains('\n') && !value.contains('\r')) {
+                                envVars.add("${key}=${value}")
+                            } else {
+                                logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid value containing newline characters" }
+                            }
+                        } else {
+                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid key name" }
+                        }
+                    } else {
+                        logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Ignoring attempt to override reserved environment variable '$key'" }
+                    }
+                }
+                
+                // Add default environment variables (these take precedence)
+                defaultEnvVars.forEach { (key, value) ->
                     envVars.add("${key}=${value}")
                 }
 
