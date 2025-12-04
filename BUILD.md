@@ -37,6 +37,9 @@ curl -fsSL https://get.jetify.com/devbox | bash
 # Enter the devbox shell (installs JDK 21 and Maven automatically)
 devbox shell
 
+# Install the needed dependencies
+devbox run install-deps
+
 # Build the project
 devbox run build
 
