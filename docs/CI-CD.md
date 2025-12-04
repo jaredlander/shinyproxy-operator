@@ -36,8 +36,8 @@ The workflow requires the following secrets to be configured in the GitHub repos
 #### `CR_REGISTRY`
 - **Description**: Container Registry URL
 - **Type**: Repository Secret
-- **Usage**: The registry URL (e.g., `landeranalytics.azurecr.io`, `ghcr.io`, etc.)
-- **Example**: `landeranalytics.azurecr.io`
+- **Usage**: The registry URL (e.g., `ghcr.io`, etc.)
+- **Example**: `ghcr.io`
 
 #### `CR_USERNAME`
 - **Description**: Username for Container Registry authentication
@@ -57,7 +57,7 @@ To configure these secrets:
 2. Navigate to **Settings** > **Secrets and variables** > **Actions**
 3. Click **New repository secret**
 4. Add each secret with the name and value:
-   - Name: `CR_REGISTRY`, Value: Your Container Registry URL (e.g., `landeranalytics.azurecr.io`, `ghcr.io`)
+   - Name: `CR_REGISTRY`, Value: Your Container Registry URL (e.g., `ghcr.io`)
    - Name: `CR_USERNAME`, Value: Your Container Registry username
    - Name: `CR_PASSWORD`, Value: Your Container Registry password
 
