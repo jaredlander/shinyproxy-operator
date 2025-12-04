@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
+  "packages": [
+    "openjdk21@latest",
+    "maven@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to ShinyProxy Operator development environment!'",
+      "echo 'Java version:'",
+      "java -version",
+      "echo ''",
+      "echo 'Maven version:'",
+      "mvn -version",
+      "echo ''",
+      "echo 'To build the project, run: mvn -U clean install'",
+      "echo 'The JAR will be at: target/shinyproxy-operator-jar-with-dependencies.jar'"
+    ],
+    "scripts": {
+      "build": [
+        "mvn -U clean install"
+      ],
+      "build-fast": [
+        "mvn clean install -DskipTests"
+      ],
+      "test": [
+        "mvn test"
+      ]
+    }
+  }
+}

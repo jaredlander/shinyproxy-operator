@@ -1,0 +1,15 @@
+# Docker Compose file for building the ShinyProxy Operator
+# Usage: docker-compose -f docker-compose.build.yml up
+
+version: '3.8'
+
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+    image: shinyproxy-operator-builder:local
+    volumes:
+      # Mount the target directory to get the built JAR
+      - ./target:/build/target
+    container_name: shinyproxy-operator-builder

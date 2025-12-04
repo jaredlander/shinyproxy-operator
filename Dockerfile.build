@@ -1,0 +1,23 @@
+# Dockerfile for building the ShinyProxy Operator
+# This provides a containerized build environment with all necessary tools
+
+FROM maven:3.9.9-eclipse-temurin-21
+
+# Set working directory
+WORKDIR /build
+
+# Copy project files
+COPY pom.xml .
+COPY src ./src
+COPY LICENSE_HEADER .
+
+# Download dependencies (this layer will be cached if pom.xml doesn't change)
+RUN mvn dependency:go-offline -B
+
+# Build the project
+RUN mvn -U clean install -DskipTests
+
+# The JAR will be at /build/target/shinyproxy-operator-jar-with-dependencies.jar
+# You can extract it using: docker cp <container-id>:/build/target/shinyproxy-operator-jar-with-dependencies.jar .
+
+CMD ["sh", "-c", "echo 'Build complete! JAR location:' && ls -lh target/*.jar"]
