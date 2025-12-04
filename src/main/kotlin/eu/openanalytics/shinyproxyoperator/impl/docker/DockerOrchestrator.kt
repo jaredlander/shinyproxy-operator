@@ -313,7 +313,8 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 
                 val envVars = mutableListOf<String>()
                 
-                // Add user-provided environment variables first, but exclude reserved keys
+                // Add user-provided environment variables, excluding reserved keys
+                // Reserved keys are filtered here to prevent any accidental override
                 shinyProxy.env.forEach { (key, value) ->
                     when {
                         RESERVED_ENV_KEYS.contains(key) -> {
@@ -331,7 +332,9 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                     }
                 }
                 
-                // Add default environment variables (these take precedence)
+                // Add required default environment variables
+                // Note: Docker uses the last occurrence when duplicates exist, but we've already
+                // filtered reserved keys above to prevent conflicts
                 defaultEnvVars.forEach { (key, value) ->
                     envVars.add("${key}=${value}")
                 }
