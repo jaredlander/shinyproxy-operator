@@ -78,7 +78,7 @@ If you experience network issues during the Maven build:
 
 ```bash
 # Build with host network (Linux only)
-docker build --network=host -f Dockerfile.build -t shinyproxy-operator-builder .
+docker build --network=host -f Dockerfile.build --target artifacts -t shinyproxy-operator-builder -o ./. .
 ```
 
 ### Permission issues with target directory
@@ -92,9 +92,7 @@ sudo chown -R $USER:$USER target/
 
 ```bash
 # Increase Docker memory limit or add Maven options
-docker run --rm -v "$(pwd)/target:/build/target" \
-  -e MAVEN_OPTS="-Xmx2048m" \
-  shinyproxy-operator-builder
+docker build -f Dockerfile.build --target artifacts --build-arg MAVEN_OPTS="-Xmx2048m" -t shinyproxy-operator-builder -o ./. .
 ```
 
 ---
@@ -104,8 +102,7 @@ docker run --rm -v "$(pwd)/target:/build/target" \
 For ongoing development:
 
 1. **Use Devbox** for the best development experience with automatic dependency management
-2. **Use Docker Compose** for one-off builds without installing tools
-3. **Use Local Build** if you already have the tools installed
+1. **Use Docker** for one-off builds without installing tools
 
 ---
 
