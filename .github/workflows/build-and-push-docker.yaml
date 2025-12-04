@@ -40,7 +40,6 @@ jobs:
         run: |
           cd shinyproxy-operator
           mvn -U clean install -DskipTests
-          ls -lh target/
       
       - name: Checkout shinyproxy-docker
         uses: actions/checkout@v4
@@ -51,7 +50,6 @@ jobs:
       - name: Copy JAR to Docker build context
         run: |
           cp shinyproxy-operator/target/shinyproxy-operator-jar-with-dependencies.jar shinyproxy-docker/Operator/
-          ls -lh shinyproxy-docker/Operator/
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
