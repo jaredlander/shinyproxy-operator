@@ -83,7 +83,11 @@ devbox run build-fast
 If you have JDK 21 and Maven installed locally:
 
 ```bash
-mvn -U clean install
+# Build without tests (faster)
+mvn clean package -DskipTests
+
+# Or build with tests
+mvn clean package
 ```
 
 The JAR will be at `target/shinyproxy-operator-jar-with-dependencies.jar`.

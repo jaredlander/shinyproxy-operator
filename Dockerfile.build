@@ -15,7 +15,7 @@ COPY LICENSE_HEADER .
 RUN mvn dependency:go-offline -B
 
 # Build the project
-RUN mvn -U clean install -DskipTests
+RUN mvn clean package -DskipTests
 
 # The JAR will be at /build/target/shinyproxy-operator-jar-with-dependencies.jar
 # You can extract it using: docker cp <container-id>:/build/target/shinyproxy-operator-jar-with-dependencies.jar .

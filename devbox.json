@@ -13,15 +13,15 @@
       "echo 'Maven version:'",
       "mvn -version",
       "echo ''",
-      "echo 'To build the project, run: mvn -U clean install'",
+      "echo 'To build the project, run: mvn clean package -DskipTests'",
       "echo 'The JAR will be at: target/shinyproxy-operator-jar-with-dependencies.jar'"
     ],
     "scripts": {
       "build": [
-        "mvn -U clean install"
+        "mvn clean package"
       ],
       "build-fast": [
-        "mvn clean install -DskipTests"
+        "mvn clean package -DskipTests"
       ],
       "test": [
         "mvn test"
