@@ -8,11 +8,12 @@ WORKDIR /build
 
 # Copy project files
 COPY pom.xml .
-COPY src ./src
-COPY LICENSE_HEADER .
 
 # Download dependencies (this layer will be cached if pom.xml doesn't change)
 RUN mvn dependency:go-offline -B
+
+COPY src ./src
+COPY LICENSE_HEADER .
 
 # Build the project
 RUN mvn clean package -DskipTests
