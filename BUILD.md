@@ -15,41 +15,11 @@ Choose one of the following options:
 
 This is the easiest option if you have Docker installed.
 
-### Quick Build with Docker Compose
-
 ```bash
-# Build the project
-docker-compose -f docker-compose.build.yml up
+docker build -f Dockerfile.build --target artifacts -t shinyproxy-operator-builder -o ./. .
 
-# The JAR will be in ./target/shinyproxy-operator-jar-with-dependencies.jar
+# the jar will be at ./shinyproxy-operator-jar-with-dependencies.jar
 ```
-
-### Alternative: Build with Dockerfile Directly
-
-```bash
-# Build the Docker image
-docker build -f Dockerfile.build -t shinyproxy-operator-builder .
-
-# Run the build
-docker run --rm -v "$(pwd)/target:/build/target" shinyproxy-operator-builder
-
-# The JAR will be in ./target/shinyproxy-operator-jar-with-dependencies.jar
-```
-
-### Extract JAR from Container (if needed)
-
-```bash
-# Start the container
-docker run -d --name builder shinyproxy-operator-builder
-
-# Copy the JAR out
-docker cp builder:/build/target/shinyproxy-operator-jar-with-dependencies.jar .
-
-# Clean up
-docker rm builder
-```
-
----
 
 ## Option 2: Build with Devbox
 
@@ -73,70 +43,29 @@ devbox run build
 # Or build without tests (faster)
 devbox run build-fast
 
+# Or to use previous build steps (faster still)
+devbox run package-fast
+
 # The JAR will be at ./target/shinyproxy-operator-jar-with-dependencies.jar
 ```
-
----
-
-## Option 3: Local Build
-
-If you have JDK 21 and Maven installed locally:
-
-```bash
-# Build without tests (faster)
-mvn clean package -DskipTests
-
-# Or build with tests
-mvn clean package
-```
-
-The JAR will be at `target/shinyproxy-operator-jar-with-dependencies.jar`.
-
----
 
 ## Verifying the Build
 
 After building, verify the JAR exists:
 
 ```bash
+# if using docker
+ls -lh shinyproxy-operator-jar-with-dependencies.jar
+
+# if using devbox
 ls -lh target/shinyproxy-operator-jar-with-dependencies.jar
 ```
 
 You should see a file of approximately 50-100 MB.
 
----
-
-## Running the Built JAR
-
-```bash
-java -jar target/shinyproxy-operator-jar-with-dependencies.jar
-```
-
----
-
 ## Building a Docker Image
 
-If you want to create a Docker image with the operator:
-
-```bash
-# First build the JAR using one of the methods above
-
-# Then create a runtime Dockerfile (example):
-cat > Dockerfile.runtime <<'EOF'
-FROM eclipse-temurin:21-jre-alpine
-
-WORKDIR /opt/shinyproxy-operator
-
-COPY target/shinyproxy-operator-jar-with-dependencies.jar shinyproxy-operator.jar
-
-ENTRYPOINT ["java", "-jar", "shinyproxy-operator.jar"]
-EOF
-
-# Build the runtime image
-docker build -f Dockerfile.runtime -t shinyproxy-operator:local .
-```
-
----
+This needs to be copied into the image at https://github.com/openanalytics/shinyproxy-docker/.
 
 ## Troubleshooting
 
