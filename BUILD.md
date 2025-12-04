@@ -70,6 +70,24 @@ You should see a file of approximately 50-100 MB.
 
 This needs to be copied into the image at https://github.com/openanalytics/shinyproxy-docker/.
 
+First clonse the repo
+
+```bash
+# clone the repo
+git clone git@github.com:openanalytics/shinyproxy-docker.git
+cd shinyproxy-docker
+```
+
+Copy the jar and build the image
+
+```bash
+# copy the jar into the build context
+cp ../shinyproxy-operator/shinyproxy-operator-jar-with-dependencies.jar Operator/.
+
+# build the docker image
+docker build -t shinyproxy-operator-dev:v2.3.1 --build-arg JAR_LOCATION=shinyproxy-operator-jar-with-dependencies.jar Operator
+```
+
 ## Troubleshooting
 
 ### Docker build fails with network errors
@@ -118,7 +136,7 @@ Example:
 ```yaml
 services:
   shinyproxy-operator:
-    image: shinyproxy-operator:local
+    image: shinyproxy-operator-dev:v2.3.1
     environment:
       - SPO_DOCKER_GID=999
       - SHINYPROXY_ENV_TEST_VAR=test_value
