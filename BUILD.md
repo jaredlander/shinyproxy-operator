@@ -85,7 +85,7 @@ Copy the jar and build the image
 cp ../shinyproxy-operator/shinyproxy-operator-jar-with-dependencies.jar Operator/.
 
 # build the docker image
-docker build -t shinyproxy-operator-dev:v2.3.1 --build-arg JAR_LOCATION=shinyproxy-operator-jar-with-dependencies.jar Operator
+docker build -t shinyproxy-operator-dev:2.3.1 --build-arg JAR_LOCATION=shinyproxy-operator-jar-with-dependencies.jar Operator
 ```
 
 ## Troubleshooting

@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit
 
 class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, config: Config) {
 
-    private val containerName = "sp-caddy"
+    private val containerName: String = config.readConfigValue("sp-caddy", "SPO_CADDY_CONTAINER_NAME") { it }
     private val dataDir: Path = mainDataDir.resolve(containerName)
     private val shinyProxies = mutableMapOf<String, Pair<ShinyProxy, ShinyProxyInstance>>()
     private val craneServers = hashMapOf<String, CraneServer>()
@@ -77,6 +77,10 @@ class CaddyConfig(private val dockerClient: DockerClient, mainDataDir: Path, con
         yamlMapper.registerModule(JSR353Module()).registerKotlinModule()
         fileManager.createDirectories(dataDir)
         fileManager.createDirectories(dataDir.resolve("certs"))
+    }
+
+    fun getContainerName(): String {
+        return containerName
     }
 
     suspend fun removeRealm(realmId: String) {

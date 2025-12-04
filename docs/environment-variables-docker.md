@@ -12,6 +12,38 @@ Any environment variable set in the operator's environment that starts with the 
 - Operator environment: `SHINYPROXY_ENV_DATABASE_URL=jdbc:postgresql://db:5432/myapp`
 - ShinyProxy container receives: `DATABASE_URL=jdbc:postgresql://db:5432/myapp`
 
+## Operator Configuration Variables
+
+The following environment variables control the ShinyProxy Operator's behavior in Docker mode:
+
+### SPO_REDIS_CONTAINER_NAME
+
+**Default:** `sp-redis`
+
+**Description:** Specifies the name of the Redis container that will be created and used by ShinyProxy for session storage. This allows you to customize the container name if needed (e.g., to avoid naming conflicts in multi-operator setups).
+
+**Example:**
+```bash
+SPO_REDIS_CONTAINER_NAME=my-custom-redis
+```
+
+**Note:** If you change this value, the operator will create a new Redis container with the custom name and a corresponding data directory. Changing this after initial deployment will result in a new Redis instance; the old one will need to be manually cleaned up.
+
+**Important:** The value of this variable is automatically used by ShinyProxy and Crane services through their Spring Boot configuration, so they will correctly reference the custom Redis container name.
+
+### SPO_CADDY_CONTAINER_NAME
+
+**Default:** `sp-caddy`
+
+**Description:** Specifies the name of the Caddy reverse proxy container that will be created to manage ingress routing for ShinyProxy instances. This allows you to customize the container name if needed (e.g., to avoid naming conflicts in multi-operator setups).
+
+**Example:**
+```bash
+SPO_CADDY_CONTAINER_NAME=my-custom-caddy
+```
+
+**Note:** If you change this value, the operator will create a new Caddy container with the custom name and a corresponding data directory. Changing this after initial deployment will result in a new Caddy instance; the old one will need to be manually cleaned up.
+
 ## Usage with Docker Compose
 
 This feature is designed to work seamlessly with Docker Compose and environment files:
@@ -27,6 +59,8 @@ services:
     environment:
       # Operator configuration
       - SPO_DOCKER_GID=999
+      - SPO_REDIS_CONTAINER_NAME=sp-redis
+      - SPO_CADDY_CONTAINER_NAME=sp-caddy
       
       # Environment variables to pass to ShinyProxy container
       - SHINYPROXY_ENV_DATABASE_URL=jdbc:postgresql://db:5432/myapp

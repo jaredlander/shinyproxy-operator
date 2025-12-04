@@ -137,6 +137,14 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
         const val SHARED_NETWORK_NAME = "sp-shared-network"
     }
 
+    fun getRedisConfig(): RedisConfig {
+        return redisConfig
+    }
+
+    fun getCaddyConfig(): CaddyConfig {
+        return caddyConfig
+    }
+
     override fun getShinyProxyStatus(shinyProxy: ShinyProxy): ShinyProxyStatus {
         return state.getOrPut(shinyProxy.realmId) { ShinyProxyStatus(shinyProxy.realmId, shinyProxy.hashOfCurrentSpec) }
     }
@@ -519,7 +527,7 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 "data" to mapOf(
                     "redis" to mapOf(
                         "password" to redisConfig.getRedisPassword(),
-                        "host" to "sp-redis"
+                        "host" to redisConfig.getContainerName()
                     )
                 )
             ))

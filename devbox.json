@@ -33,6 +33,9 @@
       "package-fast": [
         "mvn package -DskipTests"
       ],
+      "clean-compile": [
+        "mvn clean compile -q"
+      ],
       "test": [
         "mvn test"
       ]
