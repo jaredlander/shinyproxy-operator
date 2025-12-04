@@ -42,7 +42,7 @@ This repository includes automated GitHub Actions workflows for building and dep
 
 ### Docker Image Build and Push
 
-A workflow automatically builds the operator JAR, creates a Docker image, and pushes it to Azure Container Registry. See [docs/CI-CD.md](docs/CI-CD.md) for detailed documentation on:
+A workflow automatically builds the operator JAR, creates a Docker image, and pushes it to a Container Registry. See [docs/CI-CD.md](docs/CI-CD.md) for detailed documentation on:
 
 - Workflow configuration
 - Required secrets setup

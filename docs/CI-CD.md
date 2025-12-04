@@ -2,7 +2,7 @@
 
 ## Build and Push Docker Image Workflow
 
-This repository includes a GitHub Actions workflow that automatically builds the shinyproxy-operator JAR and creates a Docker image that is pushed to Azure Container Registry.
+This repository includes a GitHub Actions workflow that automatically builds the shinyproxy-operator JAR and creates a Docker image that is pushed to a Container Registry.
 
 ### Workflow File
 
@@ -25,7 +25,7 @@ The workflow is triggered on:
 5. **Checkout shinyproxy-docker**: Clones the [openanalytics/shinyproxy-docker](https://github.com/openanalytics/shinyproxy-docker) repository
 6. **Copy JAR to Docker build context**: Copies the built JAR to the Operator directory in shinyproxy-docker
 7. **Set up Docker Buildx**: Configures Docker Buildx for advanced build features
-8. **Login to Azure Container Registry**: Authenticates with the Azure Container Registry
+8. **Login to Container Registry**: Authenticates with the Container Registry
 9. **Extract metadata for Docker**: Generates Docker tags and labels based on Git context
 10. **Build and push Docker image**: Builds the Docker image and pushes it to the registry
 
@@ -33,21 +33,21 @@ The workflow is triggered on:
 
 The workflow requires the following secrets to be configured in the GitHub repository:
 
-#### `ACR_REGISTRY`
-- **Description**: Azure Container Registry URL
+#### `CR_REGISTRY`
+- **Description**: Container Registry URL
 - **Type**: Repository Secret
-- **Usage**: The registry URL (e.g., `landeranalytics.azurecr.io`)
+- **Usage**: The registry URL (e.g., `landeranalytics.azurecr.io`, `ghcr.io`, etc.)
 - **Example**: `landeranalytics.azurecr.io`
 
-#### `ACR_USERNAME`
-- **Description**: Username for Azure Container Registry authentication
+#### `CR_USERNAME`
+- **Description**: Username for Container Registry authentication
 - **Type**: Repository Secret
-- **Usage**: Used to authenticate with the Azure Container Registry
+- **Usage**: Used to authenticate with the Container Registry
 
-#### `ACR_PASSWORD`
-- **Description**: Password for Azure Container Registry authentication
+#### `CR_PASSWORD`
+- **Description**: Password for Container Registry authentication
 - **Type**: Repository Secret
-- **Usage**: Used to authenticate with the Azure Container Registry
+- **Usage**: Used to authenticate with the Container Registry
 
 ### Setting Up Secrets
 
@@ -57,9 +57,9 @@ To configure these secrets:
 2. Navigate to **Settings** > **Secrets and variables** > **Actions**
 3. Click **New repository secret**
 4. Add each secret with the name and value:
-   - Name: `ACR_REGISTRY`, Value: Your Azure Container Registry URL (e.g., `landeranalytics.azurecr.io`)
-   - Name: `ACR_USERNAME`, Value: Your Azure Container Registry username
-   - Name: `ACR_PASSWORD`, Value: Your Azure Container Registry password
+   - Name: `CR_REGISTRY`, Value: Your Container Registry URL (e.g., `landeranalytics.azurecr.io`, `ghcr.io`)
+   - Name: `CR_USERNAME`, Value: Your Container Registry username
+   - Name: `CR_PASSWORD`, Value: Your Container Registry password
 
 ### Docker Image Tags
 
@@ -71,11 +71,15 @@ The workflow automatically generates tags based on the Git context:
   - `<version>` (e.g., `1.2.3`)
   - `<major>.<minor>` (e.g., `1.2`)
   - `<major>` (e.g., `1`)
-- **SHA-based**: `<branch>-<sha>` (e.g., `main-abc1234`)
+- **Dev branch version tags**: When triggered by the `dev` branch with a version tag
+  - `dev-<version>` (e.g., `dev-1.2.3`)
+  - `dev-<major>.<minor>` (e.g., `dev-1.2`)
+  - `dev-<major>` (e.g., `dev-1`)
+- **SHA-based**: `<sha>` (e.g., `abc1234`)
 
 ### Docker Registry
 
-Images are pushed to the Azure Container Registry specified by the `ACR_REGISTRY` secret, under the repository name `shinyproxy-operator`.
+Images are pushed to the Container Registry specified by the `CR_REGISTRY` secret, under the repository name `shinyproxy-operator`.
 
 ### Build Arguments
 
@@ -112,9 +116,9 @@ If the Maven build fails:
 #### Docker Push Failures
 
 If pushing to the registry fails:
-- Verify that `ACR_REGISTRY`, `ACR_USERNAME`, and `ACR_PASSWORD` secrets are correctly set
-- Ensure the service principal has push permissions to the registry
-- Check that the registry URL in `ACR_REGISTRY` is correct and accessible
+- Verify that `CR_REGISTRY`, `CR_USERNAME`, and `CR_PASSWORD` secrets are correctly set
+- Ensure the credentials have push permissions to the registry
+- Check that the registry URL in `CR_REGISTRY` is correct and accessible
 
 #### JAR Not Found
 
