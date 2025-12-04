@@ -13,6 +13,10 @@ page in the documentation to understand why this is so great.
 
 See the [website](https://shinyproxy.io/documentation/shinyproxy-operator/kubernetes/) for all documentation.
 
+### Docker Mode: Passing Environment Variables
+
+When using the operator in Docker mode, you can pass environment variables from the operator's environment to ShinyProxy containers. This is useful for injecting secrets without storing them in plain text. See [Environment Variables for Docker Mode](docs/environment-variables-docker.md) for details.
+
 ## Support
 
 See the [website](https://shinyproxy.io/support/) on how to get support.
