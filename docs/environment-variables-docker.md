@@ -112,6 +112,9 @@ environment:
 
 - **Prefix Required:** Only environment variables starting with `SHINYPROXY_ENV_` are passed through
 - **Prefix Stripped:** The `SHINYPROXY_ENV_` prefix is automatically removed when setting the variable in the ShinyProxy container
+- **Variable Name Validation:** The variable name after stripping the prefix must not be empty (i.e., don't use `SHINYPROXY_ENV_` as the exact variable name)
+- **Value Validation:** Environment variable values cannot contain newline characters (`\n` or `\r`) for security reasons
+- **Invalid Variables:** Environment variables that don't pass validation are logged with a warning and skipped
 - **Logging:** Each passed environment variable is logged (variable name only, not the value) when the container is created
 - **Docker Only:** This feature is only available for Docker backend deployments
 - **Kubernetes:** For Kubernetes deployments, use `kubernetesPodTemplateSpecPatches` to inject environment variables or reference secrets

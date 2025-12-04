@@ -310,8 +310,19 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 System.getenv().forEach { (key, value) ->
                     if (key.startsWith("SHINYPROXY_ENV_")) {
                         val targetKey = key.removePrefix("SHINYPROXY_ENV_")
-                        envVars.add("${targetKey}=${value}")
-                        logger.info { "${logPrefix(shinyProxyInstance)} [Docker] Passing environment variable '$targetKey' to ShinyProxy container" }
+                        // Validate that the target key is not empty and value doesn't contain newlines
+                        when {
+                            targetKey.isEmpty() -> {
+                                logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Ignoring invalid environment variable with empty key: $key" }
+                            }
+                            value.contains('\n') || value.contains('\r') -> {
+                                logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$targetKey' due to invalid value containing newline characters" }
+                            }
+                            else -> {
+                                envVars.add("${targetKey}=${value}")
+                                logger.info { "${logPrefix(shinyProxyInstance)} [Docker] Passing environment variable '$targetKey' to ShinyProxy container" }
+                            }
+                        }
                     }
                 }
 
