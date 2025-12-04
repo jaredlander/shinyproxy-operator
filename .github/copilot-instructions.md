@@ -6,7 +6,7 @@ ShinyProxy Operator is a Kubernetes/Docker operator for managing ShinyProxy depl
 
 ## Technology Stack
 
-- **Language**: Kotlin 2.1 with language version 2.1
+- **Language**: Kotlin 2.1.10 with language version 2.1
 - **JDK**: Java 21 (required)
 - **Build Tool**: Maven 3.x
 - **Container Orchestration**: Kubernetes (via Fabric8 client) and Docker
@@ -135,6 +135,7 @@ Example header structure:
 - **Jackson** (2.18.3): JSON processing
 - **Log4j** (2.24.3): Logging backend
 - **Kotlin Coroutines** (1.10.1): Async programming
+- **Kotlin** (2.1.10): Kotlin language and standard library
 - **JUnit Jupiter** (5.11.4): Testing framework
 
 ### Repository Configuration
