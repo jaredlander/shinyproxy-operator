@@ -69,6 +69,13 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                          private val dataDir: Path,
                          private val inputDir: Path) : IOrchestrator {
 
+    companion object {
+        // Regex for validating environment variable key names
+        private val ENV_KEY_PATTERN = Regex("^[A-Za-z_][A-Za-z0-9_]*$")
+        // Reserved environment variable keys that cannot be overridden
+        private val RESERVED_ENV_KEYS = setOf("PROXY_VERSION", "PROXY_REALM_ID", "SPRING_CONFIG_IMPORT")
+    }
+
     private val dockerGID: Int = config.readConfigValue(null, "SPO_DOCKER_GID") { it.toInt() }
     private val dockerSocket: String = config.readConfigValue("/var/run/docker.sock", "SPO_DOCKER_SOCKET") { it }
     private val disableICC: Boolean = config.readConfigValue(false, "SPO_DISABLE_ICC") { it.toBoolean() }
@@ -308,21 +315,19 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 
                 // Add user-provided environment variables first, but exclude reserved keys
                 shinyProxy.env.forEach { (key, value) ->
-                    // Prevent overriding default environment variables
-                    if (!defaultEnvVars.containsKey(key)) {
-                        // Validate key: only allow alphanumeric characters and underscores
-                        if (key.matches(Regex("^[A-Za-z_][A-Za-z0-9_]*$"))) {
-                            // Validate value: prevent newline characters that could enable injection
-                            if (!value.contains('\n') && !value.contains('\r')) {
-                                envVars.add("${key}=${value}")
-                            } else {
-                                logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid value containing newline characters" }
-                            }
-                        } else {
+                    when {
+                        RESERVED_ENV_KEYS.contains(key) -> {
+                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Ignoring attempt to override reserved environment variable '$key'" }
+                        }
+                        !ENV_KEY_PATTERN.matches(key) -> {
                             logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid key name" }
                         }
-                    } else {
-                        logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Ignoring attempt to override reserved environment variable '$key'" }
+                        !isValidEnvValue(value) -> {
+                            logger.warn { "${logPrefix(shinyProxyInstance)} [Docker] Skipping environment variable '$key' due to invalid value containing newline characters" }
+                        }
+                        else -> {
+                            envVars.add("${key}=${value}")
+                        }
                     }
                 }
                 
@@ -596,6 +601,14 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
             logger.warn(e) { "Failed to determine owner of data dir - falling back to user 1000" }
             return 1000
         }
+    }
+
+    /**
+     * Validates that an environment variable value is safe and does not contain
+     * characters that could enable injection attacks.
+     */
+    private fun isValidEnvValue(value: String): Boolean {
+        return !value.contains('\n') && !value.contains('\r')
     }
 
 }
