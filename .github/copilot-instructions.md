@@ -18,14 +18,14 @@ ShinyProxy Operator is a Kubernetes/Docker operator for managing ShinyProxy depl
 
 ### Building the Project
 ```bash
-mvn -U clean install -DskipTests
+devbox run mvn -U clean install -DskipTests
 ```
 
 The build produces: `target/shinyproxy-operator-jar-with-dependencies.jar`
 
 ### Running Tests
 ```bash
-mvn test
+devbox run mvn test
 ```
 
 Tests require:
@@ -35,7 +35,7 @@ Tests require:
 
 ### License Header Management
 ```bash
-mvn validate license:format
+devbox run mvn validate license:format
 ```
 
 Automatically updates copyright headers. Year updates are handled automatically - don't change year manually.

@@ -95,6 +95,8 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
     private val logFilesCleaner: LogFilesCleaner
 
     init {
+        initSharedNetworkName(config)
+
         if (!Files.exists(dataDir)) {
             throw InternalException("The data directory doesn't exist: '$dataDir'!")
         }
@@ -134,7 +136,12 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
     }
 
     companion object {
-        const val SHARED_NETWORK_NAME = "sp-shared-network"
+        lateinit var SHARED_NETWORK_NAME: String
+            private set
+
+        fun initSharedNetworkName(config: Config) {
+            SHARED_NETWORK_NAME = config.readConfigValue("sp-shared-network", "SPO_SHARED_NETWORK_NAME") { it }
+        }
     }
 
     fun getRedisConfig(): RedisConfig {
@@ -199,7 +206,7 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
         }
         val containers = dockerActions.getContainers(shinyProxyInstance)
         if (containers.size < shinyProxy.replicas) {
-            val networkName = "sp-network-${shinyProxy.realmId}"
+            val networkName = "${SHARED_NETWORK_NAME}-internal-${shinyProxy.realmId}"
             if (!dockerActions.networkExists(networkName)) {
                 logger.info { "${logPrefix(shinyProxyInstance)} [Docker] Creating network" }
                 dockerActions.createNetwork(networkName, disableICC)
