@@ -316,7 +316,7 @@ class DockerOrchestrator(channel: Channel<ShinyProxyEvent>,
                 val envVars = mutableListOf(
                     "PROXY_VERSION=${version}",
                     "PROXY_REALM_ID=${shinyProxy.realmId}",
-                    "SPRING_CONFIG_IMPORT=/opt/shinyproxy/generated.yml"
+                    "SPRING_CONFIG_IMPORT_0=/opt/shinyproxy/generated.yml"
                 )
                 
                 // Add environment variables from the operator's environment
